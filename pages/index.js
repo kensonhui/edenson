@@ -11,7 +11,7 @@ export default function Home() {
       </Head>
 
       <main className="grid justify-items-center">
-        <h1>Blah</h1>
+        <h1>Fix your Godamn back</h1>
         </main>
     </div>
   )

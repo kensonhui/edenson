@@ -15,7 +15,7 @@ const videoConstraints = {
 };
 const Home = (props) => {
   useEffect(() => {
-      let interval;
+    let interval;
     const runPosenet = async () => {
       const posenet_model = await posenet.load({
         architecture: "MobileNetV1",
@@ -24,9 +24,9 @@ const Home = (props) => {
         multiplier: 0.5,
       });
       //
-    interval = setInterval(() => {
-      detectWebcamFeed(posenet_model);
-    }, 200);
+      interval = setInterval(() => {
+        detectWebcamFeed(posenet_model);
+      }, 200);
     };
     runPosenet();
 
@@ -36,6 +36,10 @@ const Home = (props) => {
   });
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const minConfidence = 0.6;
+  const [earPosition, setEarPosition] = useState(0);
+  const [shoulderPosition, setShoulderPosition] = useState(0);
+  const [hipPosition, setHipPosition] = useState(0);
 
   const detectWebcamFeed = async (posenet_model) => {
     if (
@@ -52,6 +56,8 @@ const Home = (props) => {
       webcamRef.current.video.height = videoHeight;
       // Make Estimation
       const pose = await posenet_model.estimateSinglePose(video);
+      const { keypoints } = pose;
+
       drawResult(pose, video, videoWidth, videoHeight, canvasRef);
     }
   };
@@ -67,6 +73,7 @@ const Home = (props) => {
     <div className="App">
       <header className="App-header">
         <Webcam
+          className="max-w-screen-md max-h-screen-md"
           ref={webcamRef}
           style={{
             position: "absolute",
@@ -75,23 +82,24 @@ const Home = (props) => {
             left: 0,
             right: 0,
             textAlign: "center",
-            width: 640,
-            height: 480,
           }}
         />
         <canvas
           ref={canvasRef}
+          className="max-w-screen-md max-h-screen-md"
           style={{
-            position: "absolute",
+            position: "relative",
             marginLeft: "auto",
             marginRight: "auto",
             left: 0,
             right: 0,
             textAlign: "center",
-            width: 640,
-            height: 480,
           }}
         />
+        <h2>Ear Position {earPosition} </h2>
+        <h2>Shoulder Position {shoulderPosition} </h2>
+        <h2>Hip Position {hipPosition} </h2>
+
       </header>
     </div>
   );

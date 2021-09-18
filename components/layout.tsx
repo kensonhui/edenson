@@ -1,10 +1,12 @@
 import Navbar from './navbar'
 
 export default function Layout({ children }) {
-    return(
+    return (
         <>
             <Navbar />
-            <main>{children}</main>
-            </>
+            <main>
+                {children}
+            </main>
+        </>
     )
 }
