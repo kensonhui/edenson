@@ -1,19 +1,39 @@
-import {useRef, useEffect, useState, useCallback } from "react";
-import Head from 'next/head';
+import { useRef, useEffect, useState, useCallback } from "react";
+import Head from "next/head";
 import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 import { deepStrictEqual } from "assert";
 import { nextTick } from "process";
-import {drawSkeleton, drawKeypoints} from '../../utils/utilities';
+import { drawSkeleton, drawKeypoints } from "../../utils/utilities";
 const WebcamComponent = () => <Webcam />;
 
 const videoConstraints = {
-  width: 1280,
+  width: 800,
   height: 720,
-  facingMode: "user"
+  facingMode: "user",
 };
 const Home = (props) => {
+  useEffect(() => {
+      let interval;
+    const runPosenet = async () => {
+      const posenet_model = await posenet.load({
+        architecture: "MobileNetV1",
+        outputStride: 16,
+        inputResolution: { width: 640, height: 480 },
+        multiplier: 0.5,
+      });
+      //
+    interval = setInterval(() => {
+      detectWebcamFeed(posenet_model);
+    }, 200);
+    };
+    runPosenet();
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -35,19 +55,7 @@ const Home = (props) => {
       drawResult(pose, video, videoWidth, videoHeight, canvasRef);
     }
   };
-  const runPosenet = async () => {
-    const posenet_model = await posenet.load({
-        architecture: 'MobileNetV1',
-        outputStride: 16,
-      inputResolution: { width: 640, height: 480 },
-      multiplier: 0.5
-    });
-    //
-    setInterval(() => {
-      detectWebcamFeed(posenet_model);
-    }, 100);
-  };
-  runPosenet();
+
   const drawResult = (pose, video, videoWidth, videoHeight, canvas) => {
     const ctx = canvas.current.getContext("2d");
     canvas.current.width = videoWidth;
@@ -68,7 +76,7 @@ const Home = (props) => {
             right: 0,
             textAlign: "center",
             width: 640,
-            height: 480
+            height: 480,
           }}
         />
         <canvas
@@ -81,12 +89,12 @@ const Home = (props) => {
             right: 0,
             textAlign: "center",
             width: 640,
-            height: 480
+            height: 480,
           }}
         />
       </header>
     </div>
   );
-}
+};
 
 export default Home;
